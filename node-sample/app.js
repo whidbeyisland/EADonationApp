@@ -26,7 +26,7 @@ var server = http.createServer(function (req, res) {
 
         req.on('end', function() {
             if (req.url === '/') {
-                console.log('Received message: ' + body);
+                // console.log('Received message: ' + body);
 
                 // coati: parse the amount of money from the string --- prob more elegant way to do this
                 var amount_string = body.split('=')[1];
@@ -47,22 +47,37 @@ var server = http.createServer(function (req, res) {
             const python = spawn('python', ['make_donation.py']);
             // collect data from script
             python.stdout.on('data', function (data) {
-                console.log('Pipe data from python script ...');
+                // console.log('Pipe data from python script ...');
                 dataToSend = data.toString();
             });
             // in close event we are sure that stream from child process is closed
             python.on('close', (code) => {
-                console.log(`child process close all stdio with code ${code}`);
+                // console.log(`child process close all stdio with code ${code}`);
                 res.writeHead(200);
-                var html_after_payment = '<p>You donated $' + _amount + '</p><p>' + dataToSend + '</p>';
-                res.write(html_after_payment);
+                html = fs.readFileSync('index.html');
+                const htmlsection_2 =
+                `<h1 class="mb-3">Thank you!</h1>
+                 <p>Thank you for your donation of $${_amount}.</p>`;
+                html = html.toString().replace('$htmlsection', htmlsection_2);
+                res.write(html);
                 res.end();
-                console.log(dataToSend);
             });
         });
     } else {
-        // display basic pre-made Elastic Beanstalk HTML
+        // display default page
+        const htmlsection_1 =
+        `<h1 class="mb-3">Undinero</h1>
+         <h4 class="mb-3">Undura is passionate about $Cause!</h4>
+         <p>Please help us out with anything you can, so that no $PersonAnimalRobot ever needs to $ExperienceBadThing again.</p>
+         <form action="" method="post" >
+             <label>Enter amount to donate</label>
+             <input type="number" min="0.00" max="10000.00" step="0.01" name="amount" />
+             <button type="submit" class="btn btn-primary">Donate</button>
+         </form>`;
+
         res.writeHead(200);
+        html = fs.readFileSync('index.html');
+        html = html.toString().replace('$htmlsection', htmlsection_1);
         res.write(html);
         res.end();
     }

@@ -3,6 +3,7 @@
 from authorizenet import apicontractsv1
 from authorizenet.apicontrollers import *
 from decimal import *
+import sys
  
 merchantAuth = apicontractsv1.merchantAuthenticationType()
 merchantAuth.name = '...'
@@ -17,7 +18,11 @@ payment.creditCard = creditCard
  
 transactionrequest = apicontractsv1.transactionRequestType()
 transactionrequest.transactionType ="authCaptureTransaction"
-transactionrequest.amount = Decimal ('1.55')
+try:
+       transactionrequest.amount = Decimal(sys.argv[1])
+       print('Amount of money passed to Python: ' + sys.argv[1])
+except:
+       transactionrequest.amount = Decimal('1.00')
 transactionrequest.payment = payment
  
  

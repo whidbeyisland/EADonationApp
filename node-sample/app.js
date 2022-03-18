@@ -43,6 +43,31 @@ var server = http.createServer(function (req, res) {
                 catch {
                     _amount = 0;
                 }
+
+
+                // call Python donation script
+
+                var dataToSend;
+                // spawn new child process to call the python script
+                const python = spawn('python', ['make_donation.py']);
+                console.log('got here 3.1');
+                // collect data from script
+                python.stdout.on('data', function (data) {
+                    console.log('Pipe data from python script ...');
+                    dataToSend = data.toString();
+                });
+                console.log('got here 3.2');
+                // in close event we are sure that stream from child process is closed
+                python.on('close', (code) => {
+                    console.log(`child process close all stdio with code ${code}`);
+                    // send data to browser
+                    // res.send(dataToSend)
+                    console.log(dataToSend);
+                });
+
+
+
+
             
             } else if (req.url = '/scheduled') {
                 console.log('Received task ' + req.headers['x-aws-sqsd-taskname'] + ' scheduled at ' + req.headers['x-aws-sqsd-scheduled-at']);
@@ -60,10 +85,10 @@ var server = http.createServer(function (req, res) {
 
 
         //coati: generic python code
-
+        /*
         var dataToSend;
         // spawn new child process to call the python script
-        const python = spawn('python', ['script1.py']);
+        const python = spawn('python', ['make_donation.py']);
         console.log('got here 3.1');
         // collect data from script
         python.stdout.on('data', function (data) {
@@ -78,7 +103,7 @@ var server = http.createServer(function (req, res) {
             // res.send(dataToSend)
             console.log(dataToSend);
         });
-
+        */
 
 
         //coati: was here before

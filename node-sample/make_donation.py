@@ -1,10 +1,12 @@
+# based on default transaction code from Authorize.net
+
 from authorizenet import apicontractsv1
-from authorizenet.apicontrollers import*
-from decimal import*
+from authorizenet.apicontrollers import *
+from decimal import *
  
 merchantAuth = apicontractsv1.merchantAuthenticationType()
-merchantAuth.name = '...'
-merchantAuth.transactionKey = '...'
+merchantAuth.name = '2m9Hw5Qg'
+merchantAuth.transactionKey = '6hUFVzvJ8Q8q467K'
  
 creditCard = apicontractsv1.creditCardType()
 creditCard.cardNumber ="4111111111111111"
@@ -30,6 +32,6 @@ createtransactioncontroller.execute()
 response = createtransactioncontroller.getresponse()
  
 if (response.messages.resultCode=="Ok"):
-       print('Transaction ID : %s' % response.transactionResponse.transId)
+       print('Transaction ID: %s' % response.transactionResponse.transId)
 else:
        print('response code: %s' % response.messages.resultCode)

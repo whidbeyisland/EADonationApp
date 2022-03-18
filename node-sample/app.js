@@ -7,26 +7,20 @@ var log = function(entry) {
     fs.appendFileSync('/tmp/sample-app.log', new Date().toISOString() + ' - ' + entry + '\n');
 };
 
-
-
-// coati: new
-
+// initialize Express
 const express = require('express');
 const {spawn} = require('child_process');
-var qs = require('querystring');
 const app = express();
-var _amount = 0;
 
+// local variables
+var _amount = 0; //amount of money user donates
 
-
-
+// define POST and GET methods for page
 var server = http.createServer(function (req, res) {
     if (req.method === 'POST') {
-        console.log('got here 1');
         var body = '';
 
         req.on('data', function(chunk) {
-            console.log('got here 2');
             body += chunk;
         });
 
@@ -43,83 +37,33 @@ var server = http.createServer(function (req, res) {
                 catch {
                     _amount = 0;
                 }
-
-
-                // call Python donation script
-
-                var dataToSend;
-                // spawn new child process to call the python script
-                const python = spawn('python', ['make_donation.py']);
-                console.log('got here 3.1');
-                // collect data from script
-                python.stdout.on('data', function (data) {
-                    console.log('Pipe data from python script ...');
-                    dataToSend = data.toString();
-                });
-                console.log('got here 3.2');
-                // in close event we are sure that stream from child process is closed
-                python.on('close', (code) => {
-                    console.log(`child process close all stdio with code ${code}`);
-                    // send data to browser
-                    // res.send(dataToSend)
-                    console.log(dataToSend);
-                });
-
-
-
-
-            
             } else if (req.url = '/scheduled') {
                 console.log('Received task ' + req.headers['x-aws-sqsd-taskname'] + ' scheduled at ' + req.headers['x-aws-sqsd-scheduled-at']);
             }
 
-            // res.writeHead(200, 'OK', {'Content-Type': 'text/plain'});
-            res.writeHead(200);
-            //res.write(html);
-            var html_after_payment = '<p>You donated $' + _amount + '</p>';
-            res.write(html_after_payment);
-            res.end();
+            // call Python donation script
+            var dataToSend;
+            // spawn new child process to call the python script
+            const python = spawn('python', ['make_donation.py']);
+            // collect data from script
+            python.stdout.on('data', function (data) {
+                console.log('Pipe data from python script ...');
+                dataToSend = data.toString();
+            });
+            // in close event we are sure that stream from child process is closed
+            python.on('close', (code) => {
+                console.log(`child process close all stdio with code ${code}`);
+                res.writeHead(200);
+                var html_after_payment = '<p>You donated $' + _amount + '</p><p>' + dataToSend + '</p>';
+                res.write(html_after_payment);
+                res.end();
+                console.log(dataToSend);
+            });
         });
     } else {
-        console.log('got here 3');
-
-
-        //coati: generic python code
-        /*
-        var dataToSend;
-        // spawn new child process to call the python script
-        const python = spawn('python', ['make_donation.py']);
-        console.log('got here 3.1');
-        // collect data from script
-        python.stdout.on('data', function (data) {
-            console.log('Pipe data from python script ...');
-            dataToSend = data.toString();
-        });
-        console.log('got here 3.2');
-        // in close event we are sure that stream from child process is closed
-        python.on('close', (code) => {
-            console.log(`child process close all stdio with code ${code}`);
-            // send data to browser
-            // res.send(dataToSend)
-            console.log(dataToSend);
-        });
-        */
-
-
-        //coati: was here before
-
-        console.log('got here 3.3');
+        // display basic pre-made Elastic Beanstalk HTML
         res.writeHead(200);
         res.write(html);
-
-        /*
-        //coati: trying this
-
-        var html2 = fs.readFileSync('index2.html');
-        res.write(html2);
-        */
-
-
         res.end();
     }
 });

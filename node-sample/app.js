@@ -13,7 +13,9 @@ var log = function(entry) {
 
 const express = require('express');
 const {spawn} = require('child_process');
+var qs = require('querystring');
 const app = express();
+var _amount = 0;
 
 
 
@@ -30,12 +32,27 @@ var server = http.createServer(function (req, res) {
 
         req.on('end', function() {
             if (req.url === '/') {
-                log('Received message: ' + body);
+                console.log('Received message: ' + body);
+
+                // coati: parse the amount of money from the string --- prob more elegant way to do this
+                var amount_string = body.split('=')[1];
+
+                try {
+                    _amount = parseInt(amount_string);
+                }
+                catch {
+                    _amount = 0;
+                }
+            
             } else if (req.url = '/scheduled') {
-                log('Received task ' + req.headers['x-aws-sqsd-taskname'] + ' scheduled at ' + req.headers['x-aws-sqsd-scheduled-at']);
+                console.log('Received task ' + req.headers['x-aws-sqsd-taskname'] + ' scheduled at ' + req.headers['x-aws-sqsd-scheduled-at']);
             }
 
-            res.writeHead(200, 'OK', {'Content-Type': 'text/plain'});
+            // res.writeHead(200, 'OK', {'Content-Type': 'text/plain'});
+            res.writeHead(200);
+            //res.write(html);
+            var html_after_payment = '<p>You donated $' + _amount + '</p>';
+            res.write(html_after_payment);
             res.end();
         });
     } else {
@@ -70,11 +87,14 @@ var server = http.createServer(function (req, res) {
         res.writeHead(200);
         res.write(html);
 
-
+        /*
         //coati: trying this
 
         var html2 = fs.readFileSync('index2.html');
         res.write(html2);
+        */
+
+
         res.end();
     }
 });

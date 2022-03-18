@@ -1,6 +1,8 @@
+# based on default transaction code from Authorize.net
+
 from authorizenet import apicontractsv1
-from authorizenet.apicontrollers import*
-from decimal import*
+from authorizenet.apicontrollers import *
+from decimal import *
  
 merchantAuth = apicontractsv1.merchantAuthenticationType()
 merchantAuth.name = '...'
@@ -30,6 +32,6 @@ createtransactioncontroller.execute()
 response = createtransactioncontroller.getresponse()
  
 if (response.messages.resultCode=="Ok"):
-       print('Transaction ID : %s' % response.transactionResponse.transId)
+       print('Transaction ID: %s' % response.transactionResponse.transId)
 else:
        print('response code: %s' % response.messages.resultCode)

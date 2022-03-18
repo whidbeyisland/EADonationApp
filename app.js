@@ -44,11 +44,15 @@ var server = http.createServer(function (req, res) {
             // call Python donation script
             var dataToSend;
             // spawn new child process to call the python script
-            const python = spawn('python', ['make_donation.py']);
+            const python = spawn(
+                'python',
+                ['make_donation.py', _amount]
+            );
             // collect data from script
             python.stdout.on('data', function (data) {
                 // console.log('Pipe data from python script ...');
                 dataToSend = data.toString();
+                console.log(dataToSend);
             });
             // in close event we are sure that stream from child process is closed
             python.on('close', (code) => {
@@ -70,8 +74,8 @@ var server = http.createServer(function (req, res) {
          <h4 class="mb-3">Undura is passionate about $Cause!</h4>
          <p>Please help us out with anything you can, so that no $PersonAnimalRobot ever needs to $ExperienceBadThing again.</p>
          <form action="" method="post" >
-             <label>Enter amount to donate</label>
-             <input type="number" min="0.00" max="10000.00" step="0.01" name="amount" />
+             <label>Enter amount to donate: $</label>
+             <input type="number" min="0.00" max="10000.00" step="0.01" value="10.00" name="amount" />
              <button type="submit" class="btn btn-primary">Donate</button>
          </form>`;
 

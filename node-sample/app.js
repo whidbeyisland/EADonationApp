@@ -69,6 +69,12 @@ var server = http.createServer(function (req, res) {
         console.log('got here 3.3');
         res.writeHead(200);
         res.write(html);
+
+
+        //coati: trying this
+
+        var html2 = fs.readFileSync('index2.html');
+        res.write(html2);
         res.end();
     }
 });
